@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Police Department</title>
+    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script> -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=apikey&libraries=places"></script>
+
+    <script
+      type="application.javascript"
+      src="../frontend/police/police1.js"
+    ></script>
+
+    <style>
+      #map {
+        height: 100%;
+        width: 50%;
+        float: right;
+      }
+
+      .container {
+        height: 100%;
+        width: 50%;
+        float: left;
+        background-color: #b5f1cc;
+      }
+
+      .info {
+        position: absolute;
+        /* top: 80px; */
+        /* left: 50px; */
+        /* height: 200px; */
+        /* width: 500px; */
+        width: 50%;
+        overflow: auto;
+        border-radius: 10px;
+        background-color: azure;
+      }
+      .details {
+        position: absolute;
+        left: 20px;
+        top: 10px;
+        font-size: 30px;
+      }
+      .card {
+        margin: auto;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body onload="initMap()">
+    <!-- <div class="navbar navbar-expand-lg navbar-light bg-light">
+      <a href="../police/history" class="btn btn-outline-success"> History </a>
+    </div> -->
+    <div class="container info">
+      <br />
+      <br />
+      <!-- <div class="card" style="width: 18rem"> -->
+      <!-- <img class="card-img-top" src="" alt="Card image cap" /> -->
+      <!-- <img
+          class="card-img-top"
+          src="data:image/png;base64,YnJvYWRCYW5kSWNvbi5wbmc="
+          alt="image"
+        /> -->
+      <!-- <div class="card-body">
+          <h5 class="card-title">
+            <%= report.r_acctype %> at <%= report.r_landmark%>
+          </h5>
+          <p class="card-text"><%= report.r_comment %></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><%= report.r_accno %> injured</li>
+          <li class="list-group-item">Near <%= report.r_landmark %></li>
+          <li class="list-group-item"><%= report.r_time %></li>
+          <li class="list-group-item"><div id="info"></div></li>
+        </ul>
+        <div class="card-body">
+          <a href="#" class="card-link">Show marker</a>
+          <a href="#" class="card-link">Completed</a>
+        </div>
+      </div> -->
+      <h1>Reports received</h1>
+
+      <br />
+      <div class="card" style="width: 18rem">
+        <img class="card-top-img" src="accident.png" alt="image" />
+        <div class="card-body">
+          <h5 class="card-title">
+            <%= report.r_acctype %> at <%= report.r_landmark%>
+          </h5>
+          <p class="card-text"><%= report.r_comment %></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><%= report.r_accno %> injured</li>
+          <li class="list-group-item">Near <%= report.r_landmark %></li>
+          <li class="list-group-item"><%= report.r_time %></li>
+          <li class="list-group-item"><div id="info"></div></li>
+        </ul>
+        <div class="card-body">
+          <a href="#" class="card-link">Show Route</a>
+        </div>
+      </div>
+      <br />
+      <% }); }else { %>
+      <h1>No Data Found</h1>
+      <% } %>
+      <h1>History</h1>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <tr>
+            <th>Report Id</th>
+            <th>Accident Type</th>
+            <th>No.of.Injured</th>
+            <th>Date and Time</th>
+            <th>Latitude</th>
+            <th>Longtitude</th>
+          </tr>
+          <tr>
+            <td><%=d.r_id%></td>
+            <td><%=d.r_acctype%></td>
+            <td><%=d.r_accno%></td>
+            <td><%=d.r_landmark%></td>
+            <td><%=d.r_lat%></td>
+            <td><%=d.r_long%></td>
+          </tr>
+          <% } else { %>
+          <tr>
+            <td colspan="6">No Data Found</td>
+          </tr>
+          <% } %>
+        </table>
+      </div>
+    </div>
+
+    <div id="map"></div>
+    <script>
+      ((g) => {
+        var h,
+          a,
+          k,
+          p = "The Google Maps JavaScript API",
+          c = "google",
+          l = "importLibrary",
+          q = "_ib_",
+          m = document,
+          b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+          r = new Set(),
+          e = new URLSearchParams(),
+          u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+              await (a = m.createElement("script"));
+              e.set("libraries", [...r] + "");
+              for (k in g)
+                e.set(
+                  k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()),
+                  g[k]
+                );
+              e.set("callback", c + ".maps." + q);
+              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+              d[q] = f;
+              a.onerror = () => (h = n(Error(p + " could not load.")));
+              a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+              m.head.append(a);
+            }));
+        d[l]
+          ? console.warn(p + " only loads once. Ignoring:", g)
+          : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+      })({
+        key: "apikey",
+        v: "weekly",
+        // Add other bootstrap parameters as needed, using camel case.
+        // Use the 'v' parameter to indicate the version to load (alpha, beta, weekly, etc.)
+      });
+    </script>
+
+    <script>
+      var map;
+      var directionsService;
+      var directionsRenderer;
+      var sourceAutocomplete;
+      var destAutocomplete;
+      var latLng;
+      let btnInfo = document.querySelector(".info");
+      var infoDiv = document.getElementById("info");
+
+      console.log("HIIIII");
+      const locations = [
+        { name: "Alagapuram", lat: 11.67707, lng: 78.1423 },
+        { name: "BusStand", lat: 11.668054, lng: 78.132471 },
+        { name: "Shevapet", lat: 11.64978, lng: 78.14852 },
+        { name: "Dalmia", lat: 11.7004, lng: 78.117 },
+      ];
+      let nearestStation = null;
+      let shortestDistance = Number.MAX_VALUE;
+
+      directionsService = new google.maps.DirectionsService();
+      directionsRenderer = new google.maps.DirectionsRenderer();
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 11.6603, lng: 78.146 },
+          zoom: 14,
+        });
+        google.maps.event.addListener(map, "click", function (event) {
+          this.setOptions({ scrollwheel: true });
+        });
+
+        directionsRenderer.setMap(map);
+      }
+
+      const successCallback = (position) => {
+        latLng = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        console.log(latLng);
+
+        function calcRoute() {
+          locations.forEach((location) => {
+            const distance =
+              google.maps.geometry.spherical.computeDistanceBetween(
+                new google.maps.LatLng(latLng),
+                new google.maps.LatLng(location.lat, location.lng)
+              );
+
+            if (distance < shortestDistance) {
+              shortestDistance = distance;
+              nearestStation = location;
+            }
+
+            console.log(
+              google.maps.geometry.spherical.computeDistanceBetween(
+                new google.maps.LatLng(latLng),
+                new google.maps.LatLng(location.lat, location.lng)
+              )
+            );
+          });
+
+          let source = latLng;
+
+          let destination = new google.maps.LatLng(
+            nearestStation.lat,
+            nearestStation.lng
+          ).toJSON();
+          var request = {
+            origin: source,
+            destination: destination,
+            travelMode: "DRIVING",
+          };
+          directionsService.route(request, function (result, status) {
+            if (status == "OK") {
+              directionsRenderer.setDirections(result);
+              console.log(distance);
+            }
+          });
+        }
+        btnInfo.addEventListener("click", calcRoute);
+      };
+
+      navigator.geolocation.getCurrentPosition(successCallback);
+    </script>
+  </body>
+</html>
